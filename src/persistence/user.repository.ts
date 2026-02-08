@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common'
 
-import { Role } from '../controller/car-type/role.enum'
-
 import {
   type IUserRepository,
   User,
   type UserID,
   UserNotFoundError,
 } from '../application'
+import { Role } from '../controller/car-type/role.enum'
 
 import { type Transaction } from './database-connection.interface'
 

@@ -8,6 +8,7 @@ import {
   ICarTypeService,
 } from '../../application'
 import { CarTypeBuilder, UserBuilder } from '../../builders'
+import { Role } from '../../controller/car-type/role.enum'
 import {
   AuthenticationGuardMock,
   type CarTypeServiceMock,
@@ -17,12 +18,15 @@ import { configureGlobalEnhancers } from '../../setup-app'
 import { AuthenticationGuard } from '../authentication.guard'
 
 import { CarTypeController } from './car-type.controller'
+import { RolesGuard } from './guards/roles.guard'
 
 describe('CarTypeController', () => {
   const user = UserBuilder.from({
     id: 42,
     name: 'peter',
-  }).build()
+  })
+    .withRole(Role.User)
+    .build()
 
   const carTypeOne = CarTypeBuilder.from({
     id: 13,
@@ -53,6 +57,8 @@ describe('CarTypeController', () => {
       ],
     })
       .overrideGuard(AuthenticationGuard)
+      .useValue(authenticationGuardMock)
+      .overrideGuard(RolesGuard)
       .useValue(authenticationGuardMock)
       .compile()
 
@@ -117,8 +123,7 @@ describe('CarTypeController', () => {
     })
   })
 
-  // Re-enable this test when you're implementing "Rights and Roles - Module 1".
-  describe.skip('create', () => {
+  describe('create', () => {
     it('should fail if the user is not an administrator', async () => {
       await request(app.getHttpServer())
         .post(`/car-types`)
@@ -135,8 +140,9 @@ describe('CarTypeController', () => {
       const newCarType = new CarTypeBuilder().withId(42).build()
       carTypeServiceMock.create.mockResolvedValue(newCarType)
 
-      // TODO: You have to turn the user into an administrator here for the test to pass!
-      authenticationGuardMock.user = UserBuilder.from(user).build()
+      authenticationGuardMock.user = UserBuilder.from(user)
+        .withRole(Role.Admin)
+        .build()
 
       await request(app.getHttpServer())
         .post(`/car-types`)
@@ -150,6 +156,42 @@ describe('CarTypeController', () => {
       expect(carTypeServiceMock.create).toHaveBeenCalledWith({
         name: newCarType.name,
         imageUrl: newCarType.imageUrl,
+      })
+    })
+  })
+
+  describe('patch', () => {
+    it('should fail if the user is not an administrator', async () => {
+      await request(app.getHttpServer())
+        .patch(`/car-types/${carTypeOne.id}`)
+        .send({
+          name: 'Updated name',
+        })
+        .expect(HttpStatus.FORBIDDEN)
+
+      expect(carTypeServiceMock.update).not.toHaveBeenCalled()
+    })
+
+    it('should update a car type if the user is an administrator', async () => {
+      const updatedCarType = CarTypeBuilder.from(carTypeOne)
+        .withName('Updated name')
+        .build()
+      carTypeServiceMock.update.mockResolvedValue(updatedCarType)
+
+      authenticationGuardMock.user = UserBuilder.from(user)
+        .withRole(Role.Admin)
+        .build()
+
+      await request(app.getHttpServer())
+        .patch(`/car-types/${carTypeOne.id}`)
+        .send({
+          name: 'Updated name',
+        })
+        .expect(HttpStatus.OK)
+        .expect({ ...updatedCarType })
+
+      expect(carTypeServiceMock.update).toHaveBeenCalledWith(carTypeOne.id, {
+        name: 'Updated name',
       })
     })
   })
