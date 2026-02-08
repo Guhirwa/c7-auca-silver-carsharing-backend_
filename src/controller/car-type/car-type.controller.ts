@@ -24,6 +24,8 @@ import { CarType, type CarTypeID, ICarTypeService } from '../../application'
 import { AuthenticationGuard } from '../authentication.guard'
 
 import { CarTypeDTO, CreateCarTypeDTO, PatchCarTypeDTO } from './car-type.dto'
+import { Roles } from './role.decorator'
+import { Role } from './role.enum'
 
 @ApiTags(CarType.name)
 @ApiBearerAuth()
@@ -93,6 +95,7 @@ export class CarTypeController {
       'The request was malformed, e.g. missing or invalid parameter or property in the request body.',
   })
   @Post()
+  @Roles(Role.Admin)
   public async create(@Body() data: CreateCarTypeDTO): Promise<CarTypeDTO> {
     const carType = await this.carTypeService.create(data)
 
@@ -115,6 +118,7 @@ export class CarTypeController {
     description: 'No car type with the given id was found.',
   })
   @Patch(':id')
+  @Roles(Role.Admin)
   public async patch(
     @Param('id', ParseIntPipe) carTypeId: CarTypeID,
     @Body() data: PatchCarTypeDTO,
