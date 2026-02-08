@@ -1,6 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { Observable } from 'rxjs'
 import { Role } from '../role.enum'
 import { ROLES_KEY } from '../role.decorator'
 
@@ -19,6 +18,12 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest()
-    return requiredRoles.some(role => user.roles?.includes(role))
+
+    // Admin role includes all user rights
+    if (user.role === Role.Admin) {
+      return true
+    }
+
+    return requiredRoles.includes(user.role)
   }
 }

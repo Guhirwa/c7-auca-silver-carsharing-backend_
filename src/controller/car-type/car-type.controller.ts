@@ -12,6 +12,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -24,6 +25,7 @@ import { CarType, type CarTypeID, ICarTypeService } from '../../application'
 import { AuthenticationGuard } from '../authentication.guard'
 
 import { CarTypeDTO, CreateCarTypeDTO, PatchCarTypeDTO } from './car-type.dto'
+import { RolesGuard } from './guards/roles.guard'
 import { Roles } from './role.decorator'
 import { Role } from './role.enum'
 
@@ -36,7 +38,7 @@ import { Role } from './role.enum'
 @ApiInternalServerErrorResponse({
   description: 'An internal server error occurred.',
 })
-@UseGuards(AuthenticationGuard)
+@UseGuards(AuthenticationGuard, RolesGuard)
 @Controller('/car-types')
 export class CarTypeController {
   private readonly carTypeService: ICarTypeService
@@ -84,8 +86,7 @@ export class CarTypeController {
 
   @ApiOperation({
     summary: 'Create a new car type.',
-    // This isn't the case yet - it will be implemented in "Roles and Rights - Module 1".
-    description: 'This route is only available to administrators,',
+    description: 'This route is only available to administrators.',
   })
   @ApiCreatedResponse({
     description: 'A new car type was created.',
@@ -93,6 +94,9 @@ export class CarTypeController {
   @ApiBadRequestResponse({
     description:
       'The request was malformed, e.g. missing or invalid parameter or property in the request body.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The user does not have permission to create car types.',
   })
   @Post()
   @Roles(Role.Admin)
@@ -104,8 +108,7 @@ export class CarTypeController {
 
   @ApiOperation({
     summary: 'Update an existing car type.',
-    // This isn't the case yet - it will be implemented in "Roles and Rights - Module 1".
-    description: 'This route is only available to administrators,',
+    description: 'This route is only available to administrators.',
   })
   @ApiOkResponse({
     description: 'The car type was updated.',
@@ -116,6 +119,9 @@ export class CarTypeController {
   })
   @ApiNotFoundResponse({
     description: 'No car type with the given id was found.',
+  })
+  @ApiForbiddenResponse({
+    description: 'The user does not have permission to update car types.',
   })
   @Patch(':id')
   @Roles(Role.Admin)
