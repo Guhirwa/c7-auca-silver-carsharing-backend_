@@ -17,6 +17,7 @@ export class AuthenticationGuardMock implements CanActivate {
     const request = context.switchToHttp().getRequest<Request & UnknownRecord>()
 
     request[AuthenticationGuard.USER_REQUEST_PROPERTY] = this.user
+    request.user = this.user
     return true
   }
 }

@@ -19,6 +19,7 @@ import { AuthenticationGuard } from '../authentication.guard'
 
 import { CarTypeController } from './car-type.controller'
 import { RolesGuard } from './guards/roles.guard'
+import { RolesGuardMock } from './guards/roles.guard.mock'
 
 describe('CarTypeController', () => {
   const user = UserBuilder.from({
@@ -59,7 +60,7 @@ describe('CarTypeController', () => {
       .overrideGuard(AuthenticationGuard)
       .useValue(authenticationGuardMock)
       .overrideGuard(RolesGuard)
-      .useValue(authenticationGuardMock)
+      .useClass(RolesGuardMock)
       .compile()
 
     app = moduleReference.createNestApplication()
@@ -125,6 +126,11 @@ describe('CarTypeController', () => {
 
   describe('create', () => {
     it('should fail if the user is not an administrator', async () => {
+      // Ensure user is not admin
+      authenticationGuardMock.user = UserBuilder.from(user)
+        .withRole(Role.User)
+        .build()
+
       await request(app.getHttpServer())
         .post(`/car-types`)
         .send({
@@ -162,6 +168,11 @@ describe('CarTypeController', () => {
 
   describe('patch', () => {
     it('should fail if the user is not an administrator', async () => {
+      // Ensure user is not admin
+      authenticationGuardMock.user = UserBuilder.from(user)
+        .withRole(Role.User)
+        .build()
+
       await request(app.getHttpServer())
         .patch(`/car-types/${carTypeOne.id}`)
         .send({
