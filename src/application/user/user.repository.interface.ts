@@ -1,4 +1,4 @@
-import { type Transaction } from '../../persistence'
+import { type Transaction } from '../../persistence/database-connection.interface'
 
 import { type User, type UserID } from './user'
 
@@ -13,4 +13,11 @@ export abstract class IUserRepository {
   public abstract get(tx: Transaction, id: UserID): Promise<User>
 
   public abstract getAll(tx: Transaction): Promise<User[]>
+
+  public abstract insert(
+    tx: Transaction,
+    data: { name: string; passwordHash: string; role: string },
+  ): Promise<User>
+
+  public abstract softDelete(tx: Transaction, id: UserID): Promise<void>
 }
