@@ -1,6 +1,13 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 
+import { type User } from '../../../application'
+import { AuthenticationGuard } from '../../authentication.guard'
 import { ROLES_KEY } from '../role.decorator'
 import { Role } from '../role.enum'
 
@@ -18,13 +25,26 @@ export class RolesGuard implements CanActivate {
       return true
     }
 
-    const { user } = context.switchToHttp().getRequest()
+    const request = context.switchToHttp().getRequest()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const user = request[AuthenticationGuard.USER_REQUEST_PROPERTY] as
+      | User
+      | undefined
+
+    if (!user) {
+      throw new ForbiddenException('Admin access required')
+    }
 
     // Admin role includes all user rights
     if (user.role === Role.Admin) {
       return true
     }
 
-    return requiredRoles.includes(user.role)
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException('Admin access required')
+    }
+
+    return true
   }
 }
