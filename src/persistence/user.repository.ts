@@ -71,4 +71,20 @@ export class UserRepository implements IUserRepository {
 
     return rows.map(row => rowToDomain(row))
   }
+
+  public async insert(
+    tx: Transaction,
+    data: { name: string; passwordHash: string; role: string },
+  ): Promise<User> {
+    const row = await tx.one<Row>(
+      'INSERT INTO users (name, password, role) VALUES ($(name), $(passwordHash), $(role)) RETURNING *',
+      data,
+    )
+
+    return rowToDomain(row)
+  }
+
+  public async softDelete(tx: Transaction, id: UserID): Promise<void> {
+    await tx.none('DELETE FROM users WHERE id = $(id)', { id })
+  }
 }
