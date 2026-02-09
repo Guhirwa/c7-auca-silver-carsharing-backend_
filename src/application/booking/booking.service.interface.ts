@@ -18,4 +18,6 @@ export abstract class IBookingService {
     updates: Partial<Except<BookingProperties, 'id' | 'carId' | 'renterId'>>,
     userId: UserID,
   ): Promise<Booking>
+
+  public abstract delete(id: BookingID): Promise<void>
 }
