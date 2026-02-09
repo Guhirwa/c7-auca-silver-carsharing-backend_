@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common'
 import { type Request } from 'express'
 
-import { Role } from './car-type/role.enum'
 import { AuthenticationGuard } from './authentication.guard'
+import { Role } from './car-type/role.enum'
 
 @Injectable()
 export class AdminGuard implements CanActivate {

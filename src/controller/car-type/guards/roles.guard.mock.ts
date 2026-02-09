@@ -1,8 +1,8 @@
 import { type CanActivate, type ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 
-import { Role } from '../role.enum'
 import { ROLES_KEY } from '../role.decorator'
+import { Role } from '../role.enum'
 
 export class RolesGuardMock implements CanActivate {
   canActivate(context: ExecutionContext): boolean {

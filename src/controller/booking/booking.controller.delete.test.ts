@@ -27,7 +27,7 @@ describe('BookingController - Delete', () => {
     it('should delete a booking', async () => {
       const bookingId = 1 as BookingID
 
-      bookingServiceMock.delete.mockResolvedValue(undefined)
+      bookingServiceMock.delete.mockResolvedValue()
 
       await bookingController.delete(bookingId)
 

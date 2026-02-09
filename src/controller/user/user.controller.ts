@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import {
   Controller,
   Get,
@@ -25,7 +27,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
-import { createHash } from 'node:crypto'
 
 import {
   IUserService,
@@ -35,12 +36,12 @@ import {
   CannotDeleteSelfError,
   UserNotFoundError,
 } from '../../application'
-import { AuthenticationGuard } from '../authentication.guard'
 import { AdminGuard } from '../admin.guard'
+import { AuthenticationGuard } from '../authentication.guard'
 import { CurrentUser } from '../current-user.decorator'
 
-import { UserDTO } from './user.dto'
 import { CreateUserDTO } from './create-user.dto'
+import { UserDTO } from './user.dto'
 
 /**********************************************************************************************************************\
  *                                                                                                                     *

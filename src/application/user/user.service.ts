@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common'
 
 import { IDatabaseConnection } from '../../persistence/database-connection.interface'
 
+import { CannotDeleteSelfError } from './cannot-delete-self.error'
 import { type User, type UserID } from './user'
+import { UserAlreadyExistsError } from './user-already-exists.error'
 import { IUserRepository } from './user.repository.interface'
 import { IUserService } from './user.service.interface'
-import { UserAlreadyExistsError } from './user-already-exists.error'
-import { CannotDeleteSelfError } from './cannot-delete-self.error'
 
 @Injectable()
 export class UserService implements IUserService {

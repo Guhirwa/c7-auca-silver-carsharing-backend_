@@ -33,6 +33,7 @@ describe('BookingService', () => {
       getAll: jest.fn(),
       findOverlappingBookings: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     }
 
     mockCarRepository = {

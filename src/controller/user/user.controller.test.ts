@@ -9,8 +9,8 @@ import {
 import { UserBuilder } from '../../application/user/user.builder'
 import { Role } from '../car-type/role.enum'
 
-import { UserController } from './user.controller'
 import { CreateUserDTO } from './create-user.dto'
+import { UserController } from './user.controller'
 
 describe('UserController', () => {
   let userController: UserController
@@ -79,11 +79,14 @@ describe('UserController', () => {
     it('should delete a user', async () => {
       const userId = 2 as UserID
 
-      userServiceMock.delete.mockResolvedValue(undefined)
+      userServiceMock.delete.mockResolvedValue()
 
       await userController.delete(currentUser, userId)
 
-      expect(userServiceMock.delete).toHaveBeenCalledWith(userId, currentUser.id)
+      expect(userServiceMock.delete).toHaveBeenCalledWith(
+        userId,
+        currentUser.id,
+      )
     })
 
     it('should throw ConflictException when trying to delete self', async () => {

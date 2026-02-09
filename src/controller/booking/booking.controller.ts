@@ -42,8 +42,8 @@ import {
   BookingNotFoundError,
   CannotDeletePickedUpBookingError,
 } from '../../application'
-import { AuthenticationGuard } from '../authentication.guard'
 import { AdminGuard } from '../admin.guard'
+import { AuthenticationGuard } from '../authentication.guard'
 import { CurrentUser } from '../current-user.decorator'
 
 import { BookingValidationPipe } from './booking-validation.pipe'
