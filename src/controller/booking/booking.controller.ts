@@ -6,11 +6,14 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Delete,
   UseGuards,
   BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common'
 import {
   ApiBadRequestResponse,
@@ -37,8 +40,10 @@ import {
   InvalidBookingStateTransitionError,
   CarNotFoundError,
   BookingNotFoundError,
+  CannotDeletePickedUpBookingError,
 } from '../../application'
 import { AuthenticationGuard } from '../authentication.guard'
+import { AdminGuard } from '../admin.guard'
 import { CurrentUser } from '../current-user.decorator'
 
 import { BookingValidationPipe } from './booking-validation.pipe'
@@ -231,6 +236,39 @@ export class BookingController {
 
       return BookingDTO.fromModel(booking)
     } catch (error) {
+      this.handleBookingErrors(error)
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Delete a booking.',
+  })
+  @ApiOkResponse({
+    description: 'The booking was deleted successfully.',
+  })
+  @ApiBadRequestResponse({
+    description: 'The booking ID parameter is missing or invalid.',
+  })
+  @ApiNotFoundResponse({
+    description: 'No booking with the given id was found.',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'The request was not authorized because the JWT was missing, expired or otherwise invalid.',
+  })
+  @ApiForbiddenResponse({
+    description: 'Admin access required.',
+  })
+  @UseGuards(AdminGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  public async delete(@Param('id', ParseIntPipe) id: BookingID): Promise<void> {
+    try {
+      await this.bookingService.delete(id)
+    } catch (error) {
+      if (error instanceof CannotDeletePickedUpBookingError) {
+        throw new BadRequestException(error.message)
+      }
       this.handleBookingErrors(error)
     }
   }
