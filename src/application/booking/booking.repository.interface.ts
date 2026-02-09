@@ -24,4 +24,6 @@ export abstract class IBookingRepository {
   ): Promise<Booking[]>
 
   public abstract update(tx: Transaction, booking: Booking): Promise<Booking>
+
+  public abstract delete(tx: Transaction, id: BookingID): Promise<void>
 }
