@@ -5,7 +5,7 @@ export function up(pgm: MigrationBuilder): void {
     role: {
       type: 'text',
       notNull: true,
-      default: "'user'",
+      default: 'user',
     },
   })
 }
