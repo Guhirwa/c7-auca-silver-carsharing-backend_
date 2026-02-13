@@ -14,9 +14,9 @@
   "scripts": {
     "build": "nest build --path tsconfig.build.json",
     "format": "npm run format:prettier && npm run format:eslint",
-    "format:eslint": "eslint --fix '{src,migrations,test}/**/*.ts'",
+    "format:eslint": "eslint --fix {src,migrations,test}/**/*.ts",
     "format:prettier": "prettier --write '{src,migrations,test}/**/*.{ts,json}'",
-    "start": "docker compose up -d",
+    "start": "docker compose up -d --build",
     "db:start": "docker compose up -d postgres",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

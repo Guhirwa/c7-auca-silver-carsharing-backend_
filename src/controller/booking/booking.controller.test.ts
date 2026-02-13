@@ -32,6 +32,7 @@ describe('BookingController', () => {
       get: jest.fn(),
       getAll: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     }
     bookingController = new BookingController(bookingServiceMock)
   })

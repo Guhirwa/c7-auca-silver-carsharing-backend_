@@ -2,7 +2,9 @@ import { Injectable, Logger } from '@nestjs/common'
 
 import { IDatabaseConnection } from '../../persistence/database-connection.interface'
 
+import { CannotDeleteSelfError } from './cannot-delete-self.error'
 import { type User, type UserID } from './user'
+import { UserAlreadyExistsError } from './user-already-exists.error'
 import { IUserRepository } from './user.repository.interface'
 import { IUserService } from './user.service.interface'
 
@@ -43,5 +45,30 @@ export class UserService implements IUserService {
     return this.databaseConnection.transactional(tx =>
       this.repository.findByName(tx, name),
     )
+  }
+
+  public async create(data: {
+    name: string
+    passwordHash: string
+    role: string
+  }): Promise<User> {
+    return this.databaseConnection.transactional(async tx => {
+      const existingUser = await this.repository.findByName(tx, data.name)
+      if (existingUser) {
+        throw new UserAlreadyExistsError(data.name)
+      }
+      return this.repository.insert(tx, data)
+    })
+  }
+
+  public async delete(id: UserID, currentUserId: UserID): Promise<void> {
+    if (id === currentUserId) {
+      throw new CannotDeleteSelfError()
+    }
+
+    return this.databaseConnection.transactional(async tx => {
+      await this.repository.get(tx, id)
+      await this.repository.softDelete(tx, id)
+    })
   }
 }

@@ -6,6 +6,7 @@ import {
   type UserID,
   UserNotFoundError,
 } from '../application'
+import { Role } from '../controller/car-type/role.enum'
 
 import { type Transaction } from './database-connection.interface'
 
@@ -19,6 +20,7 @@ type Row = {
   id: number
   name: string
   password: string
+  role: string
 }
 
 function rowToDomain(row: Row): User {
@@ -26,6 +28,7 @@ function rowToDomain(row: Row): User {
     id: row.id as UserID,
     name: row.name,
     passwordHash: row.password,
+    role: row.role as Role,
   })
 }
 
@@ -67,5 +70,21 @@ export class UserRepository implements IUserRepository {
     const rows = await tx.any<Row>('SELECT * FROM users')
 
     return rows.map(row => rowToDomain(row))
+  }
+
+  public async insert(
+    tx: Transaction,
+    data: { name: string; passwordHash: string; role: string },
+  ): Promise<User> {
+    const row = await tx.one<Row>(
+      'INSERT INTO users (name, password, role) VALUES ($(name), $(passwordHash), $(role)) RETURNING *',
+      data,
+    )
+
+    return rowToDomain(row)
+  }
+
+  public async softDelete(tx: Transaction, id: UserID): Promise<void> {
+    await tx.none('DELETE FROM users WHERE id = $(id)', { id })
   }
 }

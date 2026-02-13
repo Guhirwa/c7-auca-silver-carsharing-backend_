@@ -75,7 +75,8 @@ describe('BookingController (Integration)', () => {
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
           name TEXT UNIQUE,
-          password TEXT
+          password TEXT,
+          role TEXT NOT NULL DEFAULT 'user'
         )
       `)
 
@@ -117,9 +118,9 @@ describe('BookingController (Integration)', () => {
   async function seedTestData(): Promise<void> {
     await databaseConnection.transactional(async (tx: Transaction) => {
       await tx.none(`
-        INSERT INTO users (id, name, password) VALUES 
-        (1, 'testuser', 'f38f5587a7dfb8c8f853b32f7235307c867cdd19109778a051891be5d8d4892cf2aa9a128d63409572f1d181d5aa77c0977ece42717aef7aa0506f61ed94fd7d'),
-        (2, 'otheruser', '19f58557744d2a919c47266f092e21dbe5fbfd7c930599033562420cb471abf4454442f4e097304523d462e7770a3fe2a0ac04e1e11a13a32932f1c0db886ffd')
+        INSERT INTO users (id, name, password, role) VALUES 
+        (1, 'testuser', 'f38f5587a7dfb8c8f853b32f7235307c867cdd19109778a051891be5d8d4892cf2aa9a128d63409572f1d181d5aa77c0977ece42717aef7aa0506f61ed94fd7d', 'user'),
+        (2, 'otheruser', '19f58557744d2a919c47266f092e21dbe5fbfd7c930599033562420cb471abf4454442f4e097304523d462e7770a3fe2a0ac04e1e11a13a32932f1c0db886ffd', 'user')
         ON CONFLICT (id) DO NOTHING
       `)
 
@@ -487,11 +488,12 @@ describe('BookingController (Integration)', () => {
       it('should return 403 when user is neither renter nor car owner', async () => {
         await databaseConnection.transactional(async (tx: Transaction) => {
           await tx.none(
-            'INSERT INTO users (id, name, password) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
+            'INSERT INTO users (id, name, password, role) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING',
             [
               3,
               'thirduser',
               '3253659812d15922fe8c2d300fd7a7ce4466ddcdb6f24f52e83769d1ce32d43d124022e297693ff720c99fda96675f68843b054ac27f2efc7a6fc70096e256d4',
+              'user',
             ],
           )
         })

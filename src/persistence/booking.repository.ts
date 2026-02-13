@@ -158,4 +158,9 @@ export class BookingRepository implements IBookingRepository {
 
     return rowToDomain(row)
   }
+
+  public async delete(tx: Transaction, id: BookingID): Promise<void> {
+    await this.ensureBookingExists(tx, id)
+    await tx.none('DELETE FROM bookings WHERE id = $(id)', { id })
+  }
 }

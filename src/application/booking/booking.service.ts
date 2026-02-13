@@ -19,6 +19,7 @@ import {
   CarNotAvailableError,
   InvalidBookingDatesError,
   BookingStateTransitionValidator,
+  CannotDeletePickedUpBookingError,
 } from './index'
 
 @Injectable()
@@ -219,6 +220,18 @@ export class BookingService implements IBookingService {
       })
 
       return this.bookingRepository.update(tx, updatedBooking)
+    })
+  }
+
+  public async delete(id: BookingID): Promise<void> {
+    return this.databaseConnection.transactional(async tx => {
+      const booking = await this.bookingRepository.get(tx, id)
+
+      if (booking.state === BookingState.PICKED_UP) {
+        throw new CannotDeletePickedUpBookingError(id)
+      }
+
+      await this.bookingRepository.delete(tx, id)
     })
   }
 }

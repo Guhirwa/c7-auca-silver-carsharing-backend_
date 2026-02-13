@@ -70,6 +70,15 @@ export class BookingServiceMock implements IBookingService {
     return Promise.resolve(updatedBooking)
   }
 
+  public delete(id: BookingID): Promise<void> {
+    const index = this.bookings.findIndex(b => b.id === id)
+    if (index === -1) {
+      throw new Error(`Booking with id ${id} not found`)
+    }
+    this.bookings.splice(index, 1)
+    return Promise.resolve()
+  }
+
   public reset(): void {
     this.bookings = []
     this.nextId = 1
